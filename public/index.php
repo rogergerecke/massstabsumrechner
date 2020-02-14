@@ -18,7 +18,7 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <h1 class="mt-3">Maßstabsumrechner</h1>
+            <h1 class="mt-3"><a href="/">Maßstabsumrechner</a></h1>
             <p class="text-muted">Nur drei einfache Schritte um ein Zeichnungsmaß in ein gewünschtes Format umzurechnen.</p>
             <ul>
                 <li>Wähle als erstes den Maßstab durch anklicken</li>
@@ -105,14 +105,15 @@
                                         </div>
                                     </div>
 
-                                    <input type="hidden" name="toUnit" value="zoll">
+                                    <input type="hidden" name="toUnit" value="<?php echo $scale->getToUnit() ?>">
                                     <input type="text" class="form-control"
                                            placeholder="<?php echo $scale->getOutputValue(); ?>"
                                            aria-label="Setze eine Länge ein" aria-describedby="button-addon5">
                                     <div class="input-group-append" id="button-addon5">
                                         <button class="btn btn-success dropdown-toggle" type="button"
                                                 data-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="false" id="dropdownMenuTo">zoll
+                                                aria-haspopup="true" aria-expanded="false" id="dropdownMenuTo">
+                                            <?php echo $scale->getToUnit() ?>
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuTo">
                                             <?php foreach (array_reverse($scale->getValidUnits()) as $value): ?>

@@ -9,12 +9,12 @@ class ScaleUnit
     #
     #  SETTING THE TOOL
     #
-    protected $valid_scale_unit = ['1:5','1:10','1:15', '1:25', '1:30', '1:35', '1:50', '1:75','1:1000'];
+    protected $valid_scale_unit = ['1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
 
-    protected $valid_units = ['mm', 'cm', 'm', 'km', 'inch', 'zoll', 'fet', 'yeard'];
+    protected $valid_units = ['mm', 'cm', 'dm', 'm', 'km', 'inch', 'foot', 'yard', 'fathom', 'rod', 'chain'];
 
     const DEFAULT_FROM_UNIT = 'cm';
-    const DEFAULT_TO_UNIT = 'zoll';
+    const DEFAULT_TO_UNIT = 'inch';
     const DEFAULT_INPUT_VALUE = 1;
 
     ###########
@@ -179,6 +179,7 @@ class ScaleUnit
 
         // calculate the output
         $output = $input * $scaleValue;
+        $output = $this->calculateFromUnitToUnit($this->fromUnit, $this->toUnit, $output);
 
         $this->setOutputValue($output);
     }
@@ -207,14 +208,128 @@ class ScaleUnit
         $exp = explode(':', $this->scaleUnit, 2);
 
         $counter = $exp[0];
-        $denominator = (int)$exp[1];
-
-        return $this->inputUnitValue * $denominator;
+        return (int)$exp[1] * $this->inputUnitValue;
     }
 
-    public function calculateFromUnitToUnit($fromUnit = '', $toUnit = '', $value = '')
+    /* public function calculateFromUnitToUnit($fromUnit, $toUnit, $value = '')
+     {
+         if (!$fromUnit) {
+             throw new \Exception('From unit must be set and cant not be empty');
+         }
+
+         if (!$toUnit) {
+             throw new \Exception('To unit must be set and cant not be empty');
+         }
+         $unit_key = $fromUnit . '-' . $toUnit;
+
+
+         // calculate all to mm as base
+         switch ($fromUnit) {
+             case 'mm':
+                 $value = $value * 1;
+                 break;
+             case 'cm':
+                 $value = $value * 10;
+                 break;
+             case 'dm':
+                 $value = $value * 100;
+                 break;
+             case 'm':
+                 $value = $value * 1000;
+                 break;
+             case 'km':
+                 $value = $value * 1000000;
+                 break;
+             case 'inch':
+                 $value = $value * 254;
+                 break;
+             case 'foot':
+                 $value = ($value * 304.8);
+                 break;
+             case 'yard':
+                 $value = ($value * 914.4);
+                 break;
+             case 'fathom':
+                 $value = ($value / 72) * 254;
+                 break;
+             case 'link':
+                 $value = ($value * 201.1);
+                 break;
+         }
+
+         // 1* 10 * 10 * 10
+         switch ($toUnit) {
+             case 'mm':
+                 $value = $value / 1;
+                 break;
+             case 'cm':
+                 $value = $value / 10;
+                 break;
+             case 'dm':
+                 $value = $value / 100;
+                 break;
+             case 'm':
+                 $value = $value / 1000;
+                 break;
+             case 'km':
+                 $value = $value / 1000000;
+                 break;
+             case 'inch':
+                 $value = $value / 25.4;
+                 break;
+             case 'foot':
+                 $value = ($value / 25.4) * 12;
+                 break;
+             case 'yard':
+                 $value = ($value / 91.44);
+                 break;
+             case 'fathom':
+                 $value = ($value / 1820);
+                 break;
+         }
+
+         return $value;
+     }*/
+
+    function calculateFromUnitToUnit($fromUnit, $toUnit, $value = '')
     {
 
+        $to_unit_factor = 0;
+        $from_unit_factor = 0;
+
+        // get the calculate factors
+        foreach ($this->getFactors() as $factor) {
+            if ($factor['unit'] == $toUnit) {
+                $to_unit_factor = $factor['factor'];
+            }
+            if ($factor['unit'] == $fromUnit) {
+                $from_unit_factor = $factor['factor'];
+            }
+
+        }
+
+        return $to_unit_factor / $from_unit_factor * $value;
     }
 
+    function getFactors()
+    {
+        // Metric
+        $factors[] = ['factor' => floatval('1.00000000000000E+0006'), 'unit' => 'µm', 'description' => 'Mikrometer'];
+        $factors[] = ['factor' => floatval('1.00000000000000E+0002'), 'unit' => 'cm', 'description' => 'Zentimeter'];
+        $factors[] = ['factor' => floatval('1.00000000000000E+0003'), 'unit' => 'mm', 'description' => 'Millimeter'];
+        $factors[] = ['factor' => floatval('1.00000000000000E+0001'), 'unit' => 'dm', 'description' => 'Dezimeter'];
+        $factors[] = ['factor' => floatval('1.00000000000000E+0000'), 'unit' => 'm', 'description' => 'Meter'];
+        $factors[] = ['factor' => floatval('1.00000000000000E-0003'), 'unit' => 'km', 'description' => 'Kilometer'];
+
+        // American
+        $factors[] = ['factor' => floatval('39.37007874015748'), 'unit' => 'inch', 'description' => 'Zoll'];
+        $factors[] = ['factor' => floatval('3.28083989501312E+0000'), 'unit' => 'foot', 'description' => 'Feet'];
+        $factors[] = ['factor' => floatval('4.97095960000000E-0002'), 'unit' => 'chain', 'description' => 'Chain'];
+        $factors[] = ['factor' => floatval('5.46806649168854E-0001'), 'unit' => 'fathom', 'description' => 'Fathom USA'];
+        $factors[] = ['factor' => floatval('6.21371192237334E-0004'), 'unit' => 'miles', 'description' => 'Miles'];
+        $factors[] = ['factor' => floatval('1.09361329833771E+0000'), 'unit' => 'yard', 'description' => 'Yard'];
+        $factors[] = ['factor' => floatval('1.98838781515947E-0001'), 'unit' => 'rod', 'description' => 'Rods'];
+
+        return $factors;
+    }
 }
