@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "build-css": "yarn encore dev",
+    "css-production": "yarn encore production",
+    "yarn-file-watch": "yarn encore dev --watch"
+  },
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.0"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.27.0",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^7.0.1"
+  }
+}
