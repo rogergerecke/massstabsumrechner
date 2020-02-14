@@ -1,0 +1,13 @@
+body{
+    font-family: 'Arimo', sans-serif;
+}
+h1, .h3 {
+    font-family: 'Roboto', sans-serif;
+}
+h1 span.text-primary{
+    color: #335eea!important
+}
+.lead {
+    font-family: 'Arimo', sans-serif;
+    color: #869ab8
+}

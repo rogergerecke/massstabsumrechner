@@ -16,6 +16,7 @@ class ScaleUnit
     const DEFAULT_FROM_UNIT = 'cm';
     const DEFAULT_TO_UNIT = 'inch';
     const DEFAULT_INPUT_VALUE = 1;
+    const DEFAULT_OUTPUT_VALUE = 'Ergebnis Ausgabe';
 
     ###########
 
@@ -42,6 +43,15 @@ class ScaleUnit
     protected $toUnit = '';
 
     protected $outputValue;
+    private $result;
+
+    /**
+     * @return mixed
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
 
     public function __construct()
     {
@@ -55,6 +65,10 @@ class ScaleUnit
 
         if (!$this->toUnit) {
             $this->toUnit = self::DEFAULT_TO_UNIT;
+        }
+
+        if (!$this->outputValue) {
+            $this->outputValue = self::DEFAULT_OUTPUT_VALUE;
         }
     }
 
@@ -166,7 +180,7 @@ class ScaleUnit
 
 
     /**
-     * @throws \Exception
+     * @throws ScaleException
      */
     public function execute()
     {
@@ -181,14 +195,24 @@ class ScaleUnit
         $output = $input * $scaleValue;
         $output = $this->calculateFromUnitToUnit($this->fromUnit, $this->toUnit, $output);
 
+        $factore = $this->getFactors();
+        foreach ($this->valid_units as $unit) {
+            $result[] = [
+                'value' => $this->calculateFromUnitToUnit($this->fromUnit, $unit, $output),
+                'unit' => $unit,
+                'description' => $this->getFactorDescription($unit)
+            ];
+        }
+
         $this->setOutputValue($output);
+        $this->setResult($result);
     }
 
 
     /** Calculate the scale by given scaleunit
      * example 1:50  =  1cm * 50 result 50cm
      * @return float|int
-     * @throws \Exception
+     * @throws ScaleException
      */
     public function createScale()
     {
@@ -198,11 +222,11 @@ class ScaleUnit
 
         //   empty ?
         if (!$this->scaleUnit) {
-            throw new \Exception('No valid scale');
+            throw new ScaleException('No valid scale');
         }
 
         if (!$this->inputUnitValue) {
-            throw new \Exception('No valid input value');
+            throw new ScaleException('No valid input value');
         }
 
         $exp = explode(':', $this->scaleUnit, 2);
@@ -211,85 +235,6 @@ class ScaleUnit
         return (int)$exp[1] * $this->inputUnitValue;
     }
 
-    /* public function calculateFromUnitToUnit($fromUnit, $toUnit, $value = '')
-     {
-         if (!$fromUnit) {
-             throw new \Exception('From unit must be set and cant not be empty');
-         }
-
-         if (!$toUnit) {
-             throw new \Exception('To unit must be set and cant not be empty');
-         }
-         $unit_key = $fromUnit . '-' . $toUnit;
-
-
-         // calculate all to mm as base
-         switch ($fromUnit) {
-             case 'mm':
-                 $value = $value * 1;
-                 break;
-             case 'cm':
-                 $value = $value * 10;
-                 break;
-             case 'dm':
-                 $value = $value * 100;
-                 break;
-             case 'm':
-                 $value = $value * 1000;
-                 break;
-             case 'km':
-                 $value = $value * 1000000;
-                 break;
-             case 'inch':
-                 $value = $value * 254;
-                 break;
-             case 'foot':
-                 $value = ($value * 304.8);
-                 break;
-             case 'yard':
-                 $value = ($value * 914.4);
-                 break;
-             case 'fathom':
-                 $value = ($value / 72) * 254;
-                 break;
-             case 'link':
-                 $value = ($value * 201.1);
-                 break;
-         }
-
-         // 1* 10 * 10 * 10
-         switch ($toUnit) {
-             case 'mm':
-                 $value = $value / 1;
-                 break;
-             case 'cm':
-                 $value = $value / 10;
-                 break;
-             case 'dm':
-                 $value = $value / 100;
-                 break;
-             case 'm':
-                 $value = $value / 1000;
-                 break;
-             case 'km':
-                 $value = $value / 1000000;
-                 break;
-             case 'inch':
-                 $value = $value / 25.4;
-                 break;
-             case 'foot':
-                 $value = ($value / 25.4) * 12;
-                 break;
-             case 'yard':
-                 $value = ($value / 91.44);
-                 break;
-             case 'fathom':
-                 $value = ($value / 1820);
-                 break;
-         }
-
-         return $value;
-     }*/
 
     function calculateFromUnitToUnit($fromUnit, $toUnit, $value = '')
     {
@@ -311,7 +256,12 @@ class ScaleUnit
         return $to_unit_factor / $from_unit_factor * $value;
     }
 
-    function getFactors()
+
+    /**
+     * Return a array with factor date attributes
+     * @return array
+     */
+    private function getFactors()
     {
         // Metric
         $factors[] = ['factor' => floatval('1.00000000000000E+0006'), 'unit' => 'µm', 'description' => 'Mikrometer'];
@@ -331,5 +281,26 @@ class ScaleUnit
         $factors[] = ['factor' => floatval('1.98838781515947E-0001'), 'unit' => 'rod', 'description' => 'Rods'];
 
         return $factors;
+    }
+
+
+    /**
+     * @param $unit
+     * @return bool|mixed
+     */
+    private function getFactorDescription($unit){
+        $factors = $this->getFactors();
+
+        foreach ($factors as $factor){
+            if ($factor['unit'] == $unit){
+                return $factor['description'];
+            }
+        }
+        return false;
+    }
+
+    private function setResult($result)
+    {
+        $this->result = $result;
     }
 }
