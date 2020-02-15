@@ -30,3 +30,4 @@ fabric.properties
 
 node_modules/
 vendor/
+/server/logs/error.log
