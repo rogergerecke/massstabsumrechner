@@ -176,7 +176,7 @@ require_once './function_handler.php';
                     </p>
                     <div class="collapse" id="collapse">
                         <div class="card card-body">
-                            <table class="table">
+                            <table class="table table-striped">
                                 <thead>
                                 <tr>
                                     <th scope="col">Wert</th>

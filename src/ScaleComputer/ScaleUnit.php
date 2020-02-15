@@ -9,6 +9,7 @@ class ScaleUnit
     #
     #  SETTING THE TOOL
     #
+    const DEFAULT_SCALE_UNIT = '1:5';
     protected $valid_scale_unit = ['1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
 
     protected $valid_units = ['mm', 'cm', 'dm', 'm', 'km', 'inch', 'foot', 'yard', 'fathom', 'rod', 'chain'];
@@ -69,6 +70,17 @@ class ScaleUnit
 
         if (!$this->outputValue) {
             $this->outputValue = self::DEFAULT_OUTPUT_VALUE;
+        }
+
+        if (!$this->scaleUnit){
+            $this->scaleUnit = self::DEFAULT_SCALE_UNIT;
+        }
+
+        if (!$this->result){
+            try {
+                $this->execute();
+            } catch (ScaleException $e) {
+            }
         }
     }
 
@@ -195,7 +207,7 @@ class ScaleUnit
         $output = $input * $scaleValue;
         $output = $this->calculateFromUnitToUnit($this->fromUnit, $this->toUnit, $output);
 
-        $factore = $this->getFactors();
+        $factore = $this->getFactorsValues();
         foreach ($this->valid_units as $unit) {
             $result[] = [
                 'value' => $this->calculateFromUnitToUnit($this->fromUnit, $unit, $output),
@@ -212,26 +224,11 @@ class ScaleUnit
     /** Calculate the scale by given scaleunit
      * example 1:50  =  1cm * 50 result 50cm
      * @return float|int
-     * @throws ScaleException
      */
     public function createScale()
     {
-
-
-        $value = $this->inputUnitValue;
-
-        //   empty ?
-        if (!$this->scaleUnit) {
-            throw new ScaleException('No valid scale');
-        }
-
-        if (!$this->inputUnitValue) {
-            throw new ScaleException('No valid input value');
-        }
-
+        // todo add * $exp[0]
         $exp = explode(':', $this->scaleUnit, 2);
-
-        $counter = $exp[0];
         return (int)$exp[1] * $this->inputUnitValue;
     }
 
@@ -243,7 +240,7 @@ class ScaleUnit
         $from_unit_factor = 0;
 
         // get the calculate factors
-        foreach ($this->getFactors() as $factor) {
+        foreach ($this->getFactorsValues() as $factor) {
             if ($factor['unit'] == $toUnit) {
                 $to_unit_factor = $factor['factor'];
             }
@@ -261,7 +258,7 @@ class ScaleUnit
      * Return a array with factor date attributes
      * @return array
      */
-    private function getFactors()
+    private function getFactorsValues()
     {
         // Metric
         $factors[] = ['factor' => floatval('1.00000000000000E+0006'), 'unit' => 'µm', 'description' => 'Mikrometer'];
@@ -289,7 +286,7 @@ class ScaleUnit
      * @return bool|mixed
      */
     private function getFactorDescription($unit){
-        $factors = $this->getFactors();
+        $factors = $this->getFactorsValues();
 
         foreach ($factors as $factor){
             if ($factor['unit'] == $unit){
