@@ -3,7 +3,7 @@ defined('VALID_CALL') or die('Direct Access is not allowed.');
 
 // global object the scale
 use App\ScaleComputer\ScaleException;
-use App\ScaleComputer\ScaleUnit;
+use App\ScaleUnit;
 
 $scale = new ScaleUnit();
 
@@ -32,6 +32,7 @@ if (isset($_POST['inputUnitValue'])) {
     $scale->setInputUnitValue($_GET['inputUnitValue']);
 }
 
+$scale->execute();
 
 if (isset($_POST['execute'])) {
     try {

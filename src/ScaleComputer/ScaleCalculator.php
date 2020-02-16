@@ -170,7 +170,21 @@ class ScaleCalculator extends FactorSetting
             throw new ScaleException('A value must be set to scale');
         }
 
-        return $this->getFactor($to_unit) / $this->getFactor($this->unit) * $this->value;
+        if (!$to_unit) {
+            throw new ScaleException('A unit must be set for scale the unit');
+        }
+
+        $to_unit = $this->getFactor($to_unit);
+        if (!$to_unit) {
+            throw new ScaleException('Nothing unit value found in list for calculate to');
+        }
+
+        $from_unit = $this->getFactor($this->unit);
+        if (!$from_unit) {
+            throw new ScaleException('Nothing unit value found in list for calculate from');
+        }
+
+        return $to_unit / $from_unit * $this->value;
     }
 
 
@@ -187,9 +201,16 @@ class ScaleCalculator extends FactorSetting
         }
 
         // todo
-        foreach ($this->unit_filter as $unit){
-            $unit_value = $this->scaleUnit($unit);
+        foreach ($this->unit_filter as $unit) {
+            /*$result[] = [
+                'value' => $this->scaleUnit($unit),
+                $this->getFactorArrayData($unit)
+            ];*/
+            $value = ['value' => $this->scaleUnit($unit)];
+            $result[] = array_merge($value, $this->getFactorArrayData($unit));
         }
+
+        $this->setResult($result);
 
         return $this;
     }

@@ -1,18 +1,24 @@
 <?php
 
 
-namespace App\ScaleComputer;
+namespace App;
 
 
+use App\ScaleComputer\ScaleCalculator;
+
+/**
+ * Project bezogenne individiuele klasse für Maßstabsrechner
+ * Class ScaleUnit
+ * @package App
+ */
 class ScaleUnit
 {
     #
     #  SETTING THE TOOL
     #
     const DEFAULT_SCALE_UNIT = '1:5';
-    protected $valid_scale_unit = ['1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
-
-    protected $valid_units = ['mm', 'cm', 'dm', 'm', 'km', 'inch', 'foot', 'yard', 'fathom', 'rod', 'chain'];
+    protected array $valid_scale_unit = ['1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
+    protected array $valid_units = ['mm', 'cm', 'dm', 'm', 'km', 'inch', 'foot', 'yard', 'fathom', 'rod', 'chain'];
 
     const DEFAULT_FROM_UNIT = 'cm';
     const DEFAULT_TO_UNIT = 'inch';
@@ -46,6 +52,29 @@ class ScaleUnit
     protected $outputValue;
     private $result;
 
+    private $value;
+    /**
+     * @var ScaleCalculator
+     */
+    private ScaleCalculator $calculator;
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function setValue($value): void
+    {
+        $this->value = $value;
+    }
+
+
     /**
      * @return mixed
      */
@@ -53,6 +82,7 @@ class ScaleUnit
     {
         return $this->result;
     }
+
 
     public function __construct()
     {
@@ -72,16 +102,12 @@ class ScaleUnit
             $this->outputValue = self::DEFAULT_OUTPUT_VALUE;
         }
 
-        if (!$this->scaleUnit){
+        if (!$this->scaleUnit) {
             $this->scaleUnit = self::DEFAULT_SCALE_UNIT;
         }
 
-        if (!$this->result){
-            try {
-                $this->execute();
-            } catch (ScaleException $e) {
-            }
-        }
+
+        $this->calculator = new ScaleCalculator($this->inputUnitValue, $this->fromUnit, $this->valid_units);
     }
 
     /**
@@ -193,31 +219,22 @@ class ScaleUnit
 
     /**
      * @throws ScaleException
+     * @throws ScaleComputer\ScaleException
      */
     public function execute()
     {
 
-        // get the form input messurit value
-        $input = $this->getInputUnitValue();
-
         // get the scale 1cm * 50 = 50cm
-        $scaleValue = $this->createScale();
+        $value = $this->createScale();
 
-        // calculate the output
-        $output = $input * $scaleValue;
-        $output = $this->calculateFromUnitToUnit($this->fromUnit, $this->toUnit, $output);
+        $this->calculator
+            ->setUnit($this->fromUnit)
+            ->setValue($value)
+            ->setUnitFilter($this->valid_units)
+            ->calculateScale();
 
-        $factore = $this->getFactorsValues();
-        foreach ($this->valid_units as $unit) {
-            $result[] = [
-                'value' => $this->calculateFromUnitToUnit($this->fromUnit, $unit, $output),
-                'unit' => $unit,
-                'description' => $this->getFactorDescription($unit)
-            ];
-        }
-
-        $this->setOutputValue($output);
-        $this->setResult($result);
+        // full result array
+        $this->setResult($this->calculator->getResult());
     }
 
 
@@ -230,70 +247,6 @@ class ScaleUnit
         // todo add * $exp[0]
         $exp = explode(':', $this->scaleUnit, 2);
         return (int)$exp[1] * $this->inputUnitValue;
-    }
-
-
-    function calculateFromUnitToUnit($fromUnit, $toUnit, $value = '')
-    {
-
-        $to_unit_factor = 0;
-        $from_unit_factor = 0;
-
-        // get the calculate factors
-        foreach ($this->getFactorsValues() as $factor) {
-            if ($factor['unit'] == $toUnit) {
-                $to_unit_factor = $factor['factor'];
-            }
-            if ($factor['unit'] == $fromUnit) {
-                $from_unit_factor = $factor['factor'];
-            }
-
-        }
-
-        return $to_unit_factor / $from_unit_factor * $value;
-    }
-
-
-    /**
-     * Return a array with factor date attributes
-     * @return array
-     */
-    private function getFactorsValues()
-    {
-        // Metric
-        $factors[] = ['factor' => floatval('1.00000000000000E+0006'), 'unit' => 'µm', 'description' => 'Mikrometer'];
-        $factors[] = ['factor' => floatval('1.00000000000000E+0002'), 'unit' => 'cm', 'description' => 'Zentimeter'];
-        $factors[] = ['factor' => floatval('1.00000000000000E+0003'), 'unit' => 'mm', 'description' => 'Millimeter'];
-        $factors[] = ['factor' => floatval('1.00000000000000E+0001'), 'unit' => 'dm', 'description' => 'Dezimeter'];
-        $factors[] = ['factor' => floatval('1.00000000000000E+0000'), 'unit' => 'm', 'description' => 'Meter'];
-        $factors[] = ['factor' => floatval('1.00000000000000E-0003'), 'unit' => 'km', 'description' => 'Kilometer'];
-
-        // American
-        $factors[] = ['factor' => floatval('39.37007874015748'), 'unit' => 'inch', 'description' => 'Zoll'];
-        $factors[] = ['factor' => floatval('3.28083989501312E+0000'), 'unit' => 'foot', 'description' => 'Feet'];
-        $factors[] = ['factor' => floatval('4.97095960000000E-0002'), 'unit' => 'chain', 'description' => 'Chain'];
-        $factors[] = ['factor' => floatval('5.46806649168854E-0001'), 'unit' => 'fathom', 'description' => 'Fathom USA'];
-        $factors[] = ['factor' => floatval('6.21371192237334E-0004'), 'unit' => 'miles', 'description' => 'Miles'];
-        $factors[] = ['factor' => floatval('1.09361329833771E+0000'), 'unit' => 'yard', 'description' => 'Yard'];
-        $factors[] = ['factor' => floatval('1.98838781515947E-0001'), 'unit' => 'rod', 'description' => 'Rods'];
-
-        return $factors;
-    }
-
-
-    /**
-     * @param $unit
-     * @return bool|mixed
-     */
-    private function getFactorDescription($unit){
-        $factors = $this->getFactorsValues();
-
-        foreach ($factors as $factor){
-            if ($factor['unit'] == $unit){
-                return $factor['description'];
-            }
-        }
-        return false;
     }
 
     private function setResult($result)

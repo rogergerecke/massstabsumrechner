@@ -78,10 +78,6 @@ require_once './function_handler.php';
     <!--    Calculator -->
     <div class="row mb-5">
         <div class="col-md-12">
-            <?php
-
-
-            ?>
             <!--  CARD -->
             <div class="card">
                 <div class="card-body">
@@ -137,11 +133,14 @@ require_once './function_handler.php';
                                             <?php endforeach; ?>
                                         </div>
                                     </div>
-
-                                    <input type="hidden" name="toUnit" value="<?php echo $scale->getToUnit() ?>">
-                                    <input type="text" class="form-control"
-                                           placeholder="<?php echo $scale->getOutputValue(); ?>"
-                                           aria-label="Setze eine Länge ein" aria-describedby="button-addon5">
+                                    <?php foreach ($scale->getResult() as $result): ?>
+                                        <?php if ($result['unit'] == $scale->getToUnit()): ?>
+                                            <input type="hidden" name="toUnit" value="<?php echo $result['unit'] ?>">
+                                            <input type="text" class="form-control"
+                                                   placeholder="<?php echo $result['value']; ?>"
+                                                   aria-label="Setze eine Länge ein" aria-describedby="button-addon5">
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
                                     <div class="input-group-append" id="button-addon5">
                                         <button class="btn btn-success dropdown-toggle" type="button"
                                                 data-toggle="dropdown"
@@ -167,35 +166,35 @@ require_once './function_handler.php';
                     </form>
 
                     <!--                    Collapsy -->
-                    <?php if($scale->getResult()): ?>
-                    <p class="mt-5">
-                        <button class="btn btn-primary" type="button" data-toggle="collapse"
-                                data-target="#collapse" aria-expanded="false" aria-controls="collapse">
-                            Zeige alle Einheiten
-                        </button>
-                    </p>
-                    <div class="collapse" id="collapse">
-                        <div class="card card-body">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th scope="col">Wert</th>
-                                    <th scope="col">Einheit</th>
-                                    <th scope="col">Beschreibung</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <?php foreach ($scale->getResult() as $result): ?>
-                                <tr>
-                                    <td><?php echo $result['value']; ?></td>
-                                    <td><?php echo $result['unit']; ?></td>
-                                    <td><?php echo $result['description']; ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                    <?php if ($scale->getResult()): ?>
+                        <p class="mt-5">
+                            <button class="btn btn-primary" type="button" data-toggle="collapse"
+                                    data-target="#collapse" aria-expanded="false" aria-controls="collapse">
+                                Zeige alle Einheiten
+                            </button>
+                        </p>
+                        <div class="collapse" id="collapse">
+                            <div class="card card-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Wert</th>
+                                        <th scope="col">Einheit</th>
+                                        <th scope="col">Beschreibung</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($scale->getResult() as $result): ?>
+                                        <tr>
+                                            <td><?php echo $result['value']; ?></td>
+                                            <td><?php echo $result['unit']; ?></td>
+                                            <td><?php echo $result['name']; ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
                     <?php endif; ?>
                     <!-- Collapsy -->
                 </div>
