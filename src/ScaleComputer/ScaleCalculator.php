@@ -18,6 +18,8 @@ class ScaleCalculator extends FactorSetting
 
     private $input_unit;
 
+    private $result = [];
+
     public function __construct($value = null, $unit = null, $unit_filter = [], $decimal_limit = 15)
     {
 
@@ -135,6 +137,22 @@ class ScaleCalculator extends FactorSetting
         $this->input_unit = $input_unit;
     }
 
+    /**
+     * @return array
+     */
+    public function getResult(): array
+    {
+        return $this->result;
+    }
+
+    /**
+     * @param array $result
+     */
+    private function setResult(array $result): void
+    {
+        $this->result = $result;
+    }
+
 
     /**
      * Calculate a given unit value to other scale unit
@@ -144,14 +162,36 @@ class ScaleCalculator extends FactorSetting
      */
     private function scaleUnit(string $to_unit)
     {
-        if (!$this->unit){
+        if (!$this->unit) {
             throw new ScaleException('A base unit must be set for scale the unit');
         }
 
-        if (!$this->value){
+        if (!$this->value) {
             throw new ScaleException('A value must be set to scale');
         }
 
         return $this->getFactor($to_unit) / $this->getFactor($this->unit) * $this->value;
     }
+
+
+    /**
+     * @return $this
+     * @throws ScaleException
+     */
+    public function calculateScale()
+    {
+
+        // if no output filter set, calculate with all existing unit scale
+        if (!$this->unit_filter) {
+            $this->unit_filter = $this->getAllUnits();
+        }
+
+        // todo
+        foreach ($this->unit_filter as $unit){
+            $unit_value = $this->scaleUnit($unit);
+        }
+
+        return $this;
+    }
+
 }

@@ -51,4 +51,15 @@ class FactorSetting
         }
         return false;
     }
+
+    public function getAllUnits()
+    {
+        $store = $this->getStore();
+
+        $units = null;
+        foreach ($store as $item) {
+            $units[] = $item['unit'];
+        }
+        return $units;
+    }
 }
