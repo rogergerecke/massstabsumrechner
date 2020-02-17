@@ -1,13 +1,36 @@
-body{
-    font-family: 'Arimo', sans-serif;
+body {
+    font-family: 'Roboto Mono', monospace;
 }
-h1, .h3 {
-    font-family: 'Roboto', sans-serif;
+
+h1, .h3, .navbar-brand {
+    font-family: 'Bebas Neue', cursive;
 }
-h1 span.text-primary{
-    color: #335eea!important
+
+h1 span.text-primary {
+    color: #335eea !important
 }
+
+
+.container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.banner {
+    height: 33rem;
+    margin-top: 33px;
+    text-align: center;
+}
+
+.banner h1 {
+    font-weight: bold;
+    font-size: 80px;
+    line-height: 1;
+    margin-bottom: 15px;
+}
+
 .lead {
-    font-family: 'Arimo', sans-serif;
-    color: #869ab8
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #838E95 !important;
 }
