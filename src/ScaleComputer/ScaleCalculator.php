@@ -22,7 +22,7 @@ class ScaleCalculator extends FactorSetting
     /**
      * @var int
      */
-    private int $input_value_limit;
+    private $input_value_limit;
 
     public function __construct($value = null, $unit = null, $unit_filter = [], $input_value_limit = 15, $decimal_limit = 15)
     {

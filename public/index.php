@@ -200,6 +200,19 @@ require_once './function_handler.php';
             </div>
             <!--  CARD -->
 
+            <!--            Update Description -->
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <h5 class="text-warning">Die Funktionen &amp; Updates:</h5>
+                    <p class="lead">Die Berechnung der Formate funktioniert fehlerfrei.</p>
+                    <p class="lead">Das Limit für die <b>Eingabe</b> Länge ist zurzeit auf 150 Stellen reduziert</p>
+                    <p class="lead">Das Limit für die <b>Ausgabe</b> Länge ist zurzeit auf 150 Stellen reduziert</p>
+                    <h6 class="h5 text-warning">Geplant ist:</h6>
+                    <p class="lead">Erweiterter User-Input Handler zur manipulations vermeidung</p>
+                    <p class="lead">Ajax Formular für änderung der Parameter ohne die Seite neu zuladen</p>
+                </div>
+            </div>
+            <!--            Update Description END -->
         </div>
     </div>
     <!--    Calculator END -->

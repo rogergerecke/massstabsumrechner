@@ -34,7 +34,7 @@ if (isset($_POST['inputUnitValue'])) {
 
 $scale->execute();
 
-if (isset($_POST['execute'])) {
+/*if (isset($_POST['execute'])) {
     try {
         $scale->execute();
     } catch (ScaleException $e) {
@@ -44,4 +44,5 @@ if (isset($_POST['execute'])) {
         $scale->execute();
     } catch (ScaleException $e) {
     }
-}
+}*/
+
