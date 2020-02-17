@@ -63,49 +63,48 @@ require_once './function_handler.php';
             <h1>Willkommen beim <span class="text-primary">Maßstabsrechner</span></h1>
             <p class="lead mt-3">In nur drei einfachen schritten Zeichnungs Formate umrechnen.</p>
         </div>
-        <div class="col md-6">
-
-            <ul class="list-unstyled text-muted">
-                <li>Wähle als erstes den Maßstab durch anklicken</li>
-                <li>Trage ins erste Feld das gemeßenes Maß ein</li>
-                <li>Wähle die gewünschte <span class="text-danger">Eingabe-Einheit</span> und <span
-                            class="text-success">Ausgabe-Einheit</span></li>
-            </ul>
+        <div class="col-md-6">
+            <ol class="text-muted">
+                <li>Erst den Maßstab der Zeichnung auswählen.</li>
+                <li>Ins erste Feld das real gemeßene Maß von der Zeichnung eintragen.</li>
+                <li>Dann <span class="text-danger">Eingabe-Einheit</span> und <span
+                            class="text-success">Ausgabe-Einheit</span> auswählen.</li>
+            </ol>
         </div>
     </div>
     <!--    Welcome Content END -->
 
-    <!--    Calculator -->
+    <!--    Calculator Content Aria -->
     <div class="row mb-5">
         <div class="col-md-12">
             <!--  CARD -->
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Maßstab wählen:</h5>
-                    <!--                    Scale Select -->
+
+                    <!-- Scale Select -->
                     <form action="/" method="post" id="scaleUnit">
                         <input type="hidden" name="execute" value="true">
-                        <?php
-                        if ($scale->getScaleUnit()):?>
+                        <?php if ($scale->getScaleUnit()):?>
                             <input type="hidden" name="scale" value="<?php echo $scale->getScaleUnit() ?>">
                         <?php endif; ?>
                         <div class="row">
                             <div class="col">
                                 <?php foreach ($scale->getValidScaleUnit() as $value): ?>
                                     <?php if ($scale->getScaleUnit() == $value): ?>
-                                        <button class="btn btn-primary" type="submit" name="scale"
-                                                value="<?php echo $value ?>"><?php echo $value ?></button>
-                                    <?php else:; ?>
-                                        <button class="btn btn-secondary" type="submit" name="scale"
-                                                value="<?php echo $value ?>"><?php echo $value ?></button>
+                                        <button class="btn btn-primary m-1" type="submit" name="scale"
+                                                value="<?php echo $value ?>"><?php echo $value; ?></button>
+                                    <?php else: ?>
+                                        <button class="btn btn-outline-primary m-1" type="submit" name="scale"
+                                                value="<?php echo $value ?>"><?php echo $value; ?></button>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
                             </div>
                         </div>
-
-                        <!--                    Scale Select -->
+                        <!-- Scale Select END -->
                         <hr>
-                        <!--                    Messuret -->
+
+                        <!--  Measured Input Form -->
                         <div class="row">
                             <div class="col">
                                 <div class="input-group">
@@ -160,22 +159,21 @@ require_once './function_handler.php';
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-                        <!--                    Messuret -->
+                        <!--  Measured Input Form END-->
                     </form>
 
-                    <!--                    Collapsy -->
+                    <!-- Collapse -->
                     <?php if ($scale->getResult()): ?>
                         <p class="mt-5">
                             <button class="btn btn-primary" type="button" data-toggle="collapse"
                                     data-target="#collapse" aria-expanded="false" aria-controls="collapse">
-                                Zeige alle Einheiten
+                                Weitere Ausgabe-Enheiten anzeigen
                             </button>
                         </p>
                         <div class="collapse" id="collapse">
                             <div class="card card-body">
-                                <table class="table table-striped">
+                                <table class="table table-striped table-responsive-md">
                                     <thead>
                                     <tr>
                                         <th scope="col">Wert</th>

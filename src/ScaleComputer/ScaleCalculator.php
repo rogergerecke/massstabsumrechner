@@ -19,17 +19,24 @@ class ScaleCalculator extends FactorSetting
     private $input_unit;
 
     private $result = [];
+    /**
+     * @var int
+     */
+    private int $input_value_limit;
 
-    public function __construct($value = null, $unit = null, $unit_filter = [], $decimal_limit = 15)
+    public function __construct($value = null, $unit = null, $unit_filter = [], $input_value_limit = 15, $decimal_limit = 15)
     {
 
-        $this->value = $value;
+        // over set valid user input
+        $this->setValue($value);
+
         $this->unit = $unit;
         $this->unit_filter = $unit_filter;
         $this->decimal_limit = $decimal_limit;
 
         $this->input_value = $value;
         $this->input_unit = $unit;
+        $this->input_value_limit = $input_value_limit;
     }
 
     /**
@@ -46,8 +53,28 @@ class ScaleCalculator extends FactorSetting
      */
     public function setValue($value)
     {
-        $this->value = $value;
+        $this->value = str_replace(',', '.', $value);
         return $this;
+    }
+
+    /**
+     * Valid by type integer, float and $this->input_value_limit
+     * @param $value
+     * @return bool
+     */
+    public function isValueValid($value)
+    {
+        // too long 12 < 15
+        if (strlen($value) <= $this->input_value_limit) {
+            return true;
+        }
+
+        // false type
+        if (is_float($value) or is_integer($value)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -66,6 +93,22 @@ class ScaleCalculator extends FactorSetting
     {
         $this->unit = $unit;
         return $this;
+    }
+
+
+    /**
+     * Valid by the given units from FactorSetting class
+     * @param $unit
+     * @return bool
+     */
+    public function isUnitValid($unit)
+    {
+        $valid_units = $this->getAllUnits();
+
+        if (!in_array($unit, $valid_units, true)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -166,25 +209,37 @@ class ScaleCalculator extends FactorSetting
             throw new ScaleException('A base unit must be set for scale the unit');
         }
 
+        // valid the user: value before calculate
+        if (!$this->isValueValid($this->value)) {
+            echo 'The value is not valid';
+        }
         if (!$this->value) {
             throw new ScaleException('A value must be set to scale');
         }
 
+        // valid the user input: unit
+        if (!$this->isUnitValid($to_unit)) {
+            echo 'input unit not valid';
+        }
         if (!$to_unit) {
             throw new ScaleException('A unit must be set for scale the unit');
         }
 
+        // get 1.89897696
         $to_unit = $this->getFactor($to_unit);
         if (!$to_unit) {
             throw new ScaleException('Nothing unit value found in list for calculate to');
         }
 
+        // get 2.467567
         $from_unit = $this->getFactor($this->unit);
         if (!$from_unit) {
             throw new ScaleException('Nothing unit value found in list for calculate from');
         }
 
-        return $to_unit / $from_unit * $this->value;
+        $result = $to_unit / $from_unit * $this->value;
+
+        return round($result, $this->decimal_limit);
     }
 
 
@@ -200,12 +255,8 @@ class ScaleCalculator extends FactorSetting
             $this->unit_filter = $this->getAllUnits();
         }
 
-        // todo
+        // calculate the new output value
         foreach ($this->unit_filter as $unit) {
-            /*$result[] = [
-                'value' => $this->scaleUnit($unit),
-                $this->getFactorArrayData($unit)
-            ];*/
             $value = ['value' => $this->scaleUnit($unit)];
             $result[] = array_merge($value, $this->getFactorArrayData($unit));
         }

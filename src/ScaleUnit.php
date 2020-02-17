@@ -8,24 +8,59 @@ use App\ScaleComputer\ScaleCalculator;
 
 /**
  * Project bezogenne individiuele klasse für Maßstabsrechner
+ * Für dieses project die config datei
  * Class ScaleUnit
  * @package App
  */
 class ScaleUnit
 {
-    #
-    #  SETTING THE TOOL
-    #
+    /**
+     * First selected scale in Form for default calculation
+     * @var string
+     */
     const DEFAULT_SCALE_UNIT = '1:5';
-    protected array $valid_scale_unit = ['1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
-    protected array $valid_units = ['mm', 'cm', 'dm', 'm', 'km', 'inch', 'foot', 'yard', 'fathom', 'rod', 'chain'];
 
+    /**
+     * Contain the valid scale for the form button and filter
+     * @var array
+     */
+    protected $valid_scale_unit = ['1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
+
+    /**
+     * Contain the valid unit for the form button and filter
+     * @var array
+     */
+    protected $valid_units = ['mm', 'cm', 'dm', 'm', 'km', 'inch', 'foot', 'yard', 'fathom', 'rod', 'chain'];
+
+    /**
+     * start value for the Form
+     */
     const DEFAULT_FROM_UNIT = 'cm';
+
+    /**
+     * start value for the Form
+     */
     const DEFAULT_TO_UNIT = 'inch';
+
+    /**
+     * start value for the Form
+     */
     const DEFAULT_INPUT_VALUE = 1;
+
+    /**
+     * Input placeholder text
+     */
     const DEFAULT_OUTPUT_VALUE = 'Ergebnis Ausgabe';
 
-    ###########
+    /**
+     * Max length for input value
+     */
+    const MAX_INPUT_VALUE_LENGTH = 150;
+
+    /**
+     * Max length for output value
+     */
+    const MAX_OUTPUT_DECIMAL_LENGTH = 150;
 
     /**
      * The scale unit Masstab 1:50
@@ -40,6 +75,9 @@ class ScaleUnit
      */
     protected $fromUnit = '';
 
+    /**
+     * @var int|string
+     */
     protected $inputUnitValue = '';
 
     /**
@@ -49,14 +87,23 @@ class ScaleUnit
      */
     protected $toUnit = '';
 
+    /**
+     * @var string
+     */
     protected $outputValue;
+    /**
+     * @var
+     */
     private $result;
 
+    /**
+     * @var
+     */
     private $value;
     /**
      * @var ScaleCalculator
      */
-    private ScaleCalculator $calculator;
+    private $calculator;
 
     /**
      * @return mixed
@@ -84,6 +131,9 @@ class ScaleUnit
     }
 
 
+    /**
+     * ScaleUnit constructor.
+     */
     public function __construct()
     {
         if (!$this->inputUnitValue) {
@@ -107,7 +157,7 @@ class ScaleUnit
         }
 
 
-        $this->calculator = new ScaleCalculator($this->inputUnitValue, $this->fromUnit, $this->valid_units);
+        $this->calculator = new ScaleCalculator($this->inputUnitValue, $this->fromUnit, $this->valid_units, self::MAX_INPUT_VALUE_LENGTH, self::MAX_OUTPUT_DECIMAL_LENGTH);
     }
 
     /**
@@ -216,9 +266,15 @@ class ScaleUnit
         $this->outputValue = $outputValue;
     }
 
+    /**
+     * @param $result
+     */
+    private function setResult($result)
+    {
+        $this->result = $result;
+    }
 
     /**
-     * @throws ScaleException
      * @throws ScaleComputer\ScaleException
      */
     public function execute()
@@ -244,13 +300,16 @@ class ScaleUnit
      */
     public function createScale()
     {
-        // todo add * $exp[0]
+        // todo add * $exp[0] handle
         $exp = explode(':', $this->scaleUnit, 2);
-        return (int)$exp[1] * $this->inputUnitValue;
-    }
 
-    private function setResult($result)
-    {
-        $this->result = $result;
+        // valid input ?
+        $value = str_replace(',', '.', $this->inputUnitValue);
+        // the right type or length
+        if (!$this->calculator->isValueValid($value)) {
+            echo 'The value must be from type float or integer';
+        }
+
+        return (int)$exp[1] * $value;
     }
 }
