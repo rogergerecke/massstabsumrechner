@@ -23,14 +23,15 @@ h1 span.text-primary {
 }
 
 .banner h1 {
+    margin-top: 8px;
     font-weight: bold;
     font-size: 80px;
     line-height: 1;
-    margin-bottom: 15px;
+    margin-bottom: 13px;
 }
 
 .lead {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 19px;
     color: #838E95 !important;
 }
