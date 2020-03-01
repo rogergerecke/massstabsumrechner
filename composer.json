@@ -16,5 +16,8 @@
   },
   "require": {
     "twitter/bootstrap": "v4.4.1"
+  },
+  "require-dev": {
+    "components/jquery": "3.4.1"
   }
 }

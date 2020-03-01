@@ -1,5 +1,9 @@
 body {
     font-family: 'Roboto Mono', monospace;
+
+}
+html{
+    scroll-behavior: smooth;
 }
 
 h1, .h3, .navbar-brand {

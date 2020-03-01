@@ -18,19 +18,19 @@ class ScaleUnit
      * First selected scale in Form for default calculation
      * @var string
      */
-    const DEFAULT_SCALE_UNIT = '1:5';
+    const DEFAULT_SCALE_UNIT = '1:1';
 
     /**
      * Contain the valid scale for the form button and filter
      * @var array
      */
-    protected $valid_scale_unit = ['1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
+    protected $valid_scale_unit = ['1:1','1:5', '1:10', '1:15', '1:25', '1:30', '1:35', '1:50', '1:75', '1:1000'];
 
     /**
      * Contain the valid unit for the form button and filter
-     * @var array
+     * @var array ['mm', 'cm', 'dm', 'm', 'km', 'in', 'ft', 'yd', 'fat', 'rod', 'ch','mi']
      */
-    protected $valid_units = ['mm', 'cm', 'dm', 'm', 'km', 'inch', 'foot', 'yard', 'fathom', 'rod', 'chain'];
+    protected $valid_units = [];
 
     /**
      * start value for the Form
@@ -40,7 +40,7 @@ class ScaleUnit
     /**
      * start value for the Form
      */
-    const DEFAULT_TO_UNIT = 'inch';
+    const DEFAULT_TO_UNIT = 'in';
 
     /**
      * start value for the Form
